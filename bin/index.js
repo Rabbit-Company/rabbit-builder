@@ -56,7 +56,7 @@ try{
 
 console.log();
 
-log(bold(tasks.length) + " tasks detected. [" + tasks + "]");
+log(bold(tasks.length) + " tasks detected. [" + bold(tasks) + "]");
 
 // Validate tasks
 let validTasks = 0;
@@ -64,7 +64,7 @@ let invalidTasks = 0;
 let vtasks = [];
 for(let i = 0; i < tasks.length; i++){
 	try{
-		const data = fs.readFileSync(path.resolve(dir, tasksLocation, tasks[i], 'rabbit-tasks.json'), 'utf8');
+		const data = fs.readFileSync(path.resolve(dir, tasksLocation, tasks[i], 'rabbit-task.json'), 'utf8');
 		JSON.parse(data);
 		vtasks.push(tasks[i]);
 		validTasks++;
@@ -74,4 +74,4 @@ for(let i = 0; i < tasks.length; i++){
 }
 tasks = vtasks;
 
-log(bold(validTasks) + " valid tasks and " + bold(invalidTasks) + " invalid tasks. Valid tasks: [" + tasks + "]");
+log(bold(validTasks) + " valid tasks and " + bold(invalidTasks) + " invalid tasks. Valid tasks: [" + bold(tasks) + "]");
