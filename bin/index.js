@@ -8,6 +8,7 @@ const { displayTitle, log } = require('./utils.js');
 
 let config = {};
 let tasks = [];
+let taskConfig = {};
 
 displayTitle();
 
@@ -65,7 +66,7 @@ let vtasks = [];
 for(let i = 0; i < tasks.length; i++){
 	try{
 		const data = fs.readFileSync(path.resolve(dir, tasksLocation, tasks[i], 'rabbit-task.json'), 'utf8');
-		JSON.parse(data);
+		taskConfig[tasks[i]] = JSON.parse(data);
 		vtasks.push(tasks[i]);
 		validTasks++;
 	}catch{
@@ -75,3 +76,12 @@ for(let i = 0; i < tasks.length; i++){
 tasks = vtasks;
 
 log(bold(validTasks) + " valid tasks and " + bold(invalidTasks) + " invalid tasks. Valid tasks: [" + bold(tasks) + "]");
+console.log();
+
+// Start tasks
+for(let i = 0; i < Object.keys(taskConfig).length; i++){
+	let task = Object.keys(taskConfig)[i];
+	log(`Starting task '${bold(task)}'`);
+
+	log(`Task '${bold(task)}' completed.`, 'SUCCESS');
+}
