@@ -85,3 +85,5 @@ for(let i = 0; i < Object.keys(taskConfig).length; i++){
 
 	log(`Task '${bold(task)}' completed.`, 'SUCCESS');
 }
+
+console.log();
