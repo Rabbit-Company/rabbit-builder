@@ -3,10 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require("crypto");
+const { bold } = require('kleur');
 const { displayTitle, log } = require('./utils.js');
 
 let config = {};
-let tasksAmount = 0;
+let tasks = [];
 
 displayTitle();
 
@@ -42,9 +43,17 @@ try{
 let tasksLocation = config.tasks.location || "apps";
 try{
 	const data = fs.readdirSync(path.resolve(dir, tasksLocation), 'utf8');
-	tasksAmount = data.length;
+	for(let i = 0; i < data.length; i++){
+		try{
+			if(fs.lstatSync(path.resolve(dir, tasksLocation, data[i])).isDirectory()) tasks.push(data[i]);
+		}catch{};
+	}
 	log("Tasks directory: " + path.resolve(dir, tasksLocation));
 }catch(err){
 	log("The tasks directory is missing!", 'ERROR');
 	return;
 }
+
+console.log();
+
+log(bold(tasks.length) + " tasks detected.")
