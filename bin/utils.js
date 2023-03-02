@@ -1,4 +1,4 @@
-const { green, red, blue, yellow, gray } = require('kleur');
+const { green, red, cyan, yellow, gray } = require('kleur');
 
 function log(message, type = 'INFO'){
 	let time = new Date().toLocaleTimeString();
@@ -13,8 +13,8 @@ function log(message, type = 'INFO'){
 		type = green('SUCCESS');
 		message = green(message);
 	}else{
-		type = blue(' INFO  ');
-		message = blue(message);
+		type = cyan(' INFO  ');
+		message = cyan(message);
 	}
 
 	console.log(`${gray('[')}${time}${gray(']')} ${gray('[')}${type}${gray(']')} ${message}`);

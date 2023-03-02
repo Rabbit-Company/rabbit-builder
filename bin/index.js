@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const path = require('path');
 const crypto = require("crypto");
 const { bold, green, red, blue } = require('kleur');
 const { log } = require('./utils.js');
+
+let config = {};
 
 console.log(blue(`
  _____       _     _     _ _     ____        _ _     _
@@ -24,5 +27,12 @@ if(process.argv.length < 3){
 }
 
 const dir = path.resolve(process.argv[2]);
+log("Project directory: " + dir);
 
-console.log(dir);
+try{
+	const data = fs.readFileSync(path.resolve(dir, 'rabbit-builder.json'), 'utf8');
+	config = JSON.parse(data);
+}catch(err){
+	log("Configuration file 'rabbit-builder.json' is missing or corrupt!", 'ERROR');
+	return;
+}
