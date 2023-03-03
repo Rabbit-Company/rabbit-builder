@@ -30,7 +30,7 @@ async function copy(task, action, location, config){
 
 	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.cyan, nameTransformFn: chalk.cyan });
 	//fs.copySync(copyFrom, resolve(location, 'output'), { filter: path => (!excludes.includes(path.replace(copyFrom, '')))});
-	multiBar.incrementTask(task + ' | ' + action, { percentage: 0.2 });
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 
 	return new Promise((resolve, reject) => { resolve() });
 }
@@ -44,6 +44,6 @@ async function sleep(task, action, config){
 		multiBar.incrementTask(task + ' | ' + action, { percentage: 1/config.time });
 	}
 
-	multiBar.done(task + ' | ' + action, { message: 'Finished!' });
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 	return new Promise((resolve, reject) => { resolve() });
 }
