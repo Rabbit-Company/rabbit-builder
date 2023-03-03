@@ -10,6 +10,9 @@
 		"rabbit-builder": "./bin/index.js"
 	},
 	"dependencies": {
+		"cli-progress": "^3.12.0",
+		"fs-extra": "^11.1.0",
+		"glob": "^9.2.1",
 		"kleur": "^4.1.5"
 	}
 }

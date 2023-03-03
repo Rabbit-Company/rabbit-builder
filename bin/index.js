@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require("crypto");
 const { bold } = require('kleur');
 const { displayTitle, log } = require('./utils.js');
+const { executeAction } = require('./actions.js');
 
 let config = {};
 let tasks = [];
@@ -81,8 +82,14 @@ console.log();
 // Start tasks
 for(let i = 0; i < Object.keys(taskConfig).length; i++){
 	let task = Object.keys(taskConfig)[i];
+	let actions = taskConfig[task];
 	log(`Starting task '${bold(task)}'`);
-
+	for(let j = 0; j < Object.keys(actions).length; j++){
+		let action = Object.keys(actions)[j];
+		log(`    Starting action '${bold(action)}'`);
+		let status = executeAction(path.resolve(dir, tasksLocation, task), actions[action]);
+		if(status !== 0) log('    ' + status, 'ERROR');
+	}
 	log(`Task '${bold(task)}' completed.`, 'SUCCESS');
 }
 
