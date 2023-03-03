@@ -1,7 +1,7 @@
-const { green, red, blue, cyan, yellow, gray } = require('kleur');
+import chalk from "chalk";
 
-function displayTitle(){
-	console.log(blue(`
+export function displayTitle(){
+	console.log(chalk.blue(`
   _____       _     _     _ _     ____        _ _     _
  |  __ \\     | |   | |   (_) |   |  _ \\      (_) |   | |
  | |__) |__ _| |__ | |__  _| |_  | |_) |_   _ _| | __| | ___ _ __
@@ -12,24 +12,22 @@ function displayTitle(){
  `));
 }
 
-function log(message, type = 'INFO'){
+export function log(message, type = 'INFO'){
 	let time = new Date().toLocaleTimeString();
 
 	if(type === 'ERROR'){
-		type = red(' ERROR ');
-		message = red(message);
+		type = chalk.red(' ERROR ');
+		message = chalk.red(message);
 	}else if(type === 'WARN'){
-		type = yellow(' WARN  ');
-		message = yellow(message);
+		type = chalk.yellow(' WARN  ');
+		message = chalk.yellow(message);
 	}else if(type === 'SUCCESS'){
-		type = green('SUCCESS');
-		message = green(message);
+		type = chalk.green('SUCCESS');
+		message = chalk.green(message);
 	}else{
-		type = cyan(' INFO  ');
-		message = cyan(message);
+		type = chalk.cyan(' INFO  ');
+		message = chalk.cyan(message);
 	}
 
-	console.log(`${gray('[')}${time}${gray(']')} ${gray('[')}${type}${gray(']')} ${message}`);
+	console.log(`${chalk.gray('[')}${time}${chalk.gray(']')} ${chalk.gray('[')}${type}${chalk.gray(']')} ${message}`);
 }
-
-module.exports = { displayTitle, log };

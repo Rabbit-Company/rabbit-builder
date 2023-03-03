@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require("crypto");
-const { bold } = require('kleur');
-const { displayTitle, log } = require('./utils.js');
-const { executeAction } = require('./actions.js');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import chalk from "chalk";
+import { displayTitle, log } from './utils.mjs';
+import { executeAction } from './actions.mjs';
 
 let config = {};
 let tasks = [];
@@ -18,7 +18,7 @@ if(process.argv.length < 3){
 	log("Example 1 (Current directory): rabbit-builder .");
 	log("Example 2 (Relative path): rabbit-builder Passky/Passky-Client");
 	log("Example 3 (Absolute path): rabbit-builder /home/ziga/Documents/Projects/Passky/Passky-Client");
-	return;
+	process.exit();
 }
 
 const dir = path.resolve(process.argv[2]);
@@ -30,7 +30,7 @@ try{
 	log("Configuration file: " + path.resolve(dir, 'rabbit-builder.json'));
 }catch(err){
 	log("Configuration file 'rabbit-builder.json' is missing or corrupt!", 'ERROR');
-	return;
+	process.exit();
 }
 
 let codeLocation = config.code.location || "src";
@@ -39,7 +39,7 @@ try{
 	log("Source code directory: " + path.resolve(dir, codeLocation));
 }catch(err){
 	log("The projects source code is missing!", 'ERROR');
-	return;
+	process.exit();
 }
 
 let tasksLocation = config.tasks.location || "apps";
@@ -53,12 +53,12 @@ try{
 	log("Tasks directory: " + path.resolve(dir, tasksLocation));
 }catch(err){
 	log("The tasks directory is missing!", 'ERROR');
-	return;
+	process.exit();
 }
 
 console.log();
 
-log(bold(tasks.length) + " tasks detected. [" + bold(tasks) + "]");
+log(chalk.bold(tasks.length) + " tasks detected. [" + chalk.bold(tasks) + "]");
 
 // Validate tasks
 let validTasks = 0;
@@ -76,21 +76,24 @@ for(let i = 0; i < tasks.length; i++){
 }
 tasks = vtasks;
 
-log(bold(validTasks) + " valid tasks and " + bold(invalidTasks) + " invalid tasks. Valid tasks: [" + bold(tasks) + "]");
+log(chalk.bold(validTasks) + " valid tasks and " + chalk.bold(invalidTasks) + " invalid tasks. Valid tasks: [" + chalk.bold(tasks) + "]");
 console.log();
+
+async function runActions(task, actions){
+	for(let j = 0; j < Object.keys(actions).length; j++){
+		let action = Object.keys(actions)[j];
+		await executeAction(task, action, path.resolve(dir, tasksLocation, task), actions[action]).then().catch(message => {
+			log(`[${task}][${action}] ` + message, 'ERROR');
+		});
+	}
+}
 
 // Start tasks
 for(let i = 0; i < Object.keys(taskConfig).length; i++){
 	let task = Object.keys(taskConfig)[i];
 	let actions = taskConfig[task];
-	log(`Starting task '${bold(task)}'`);
-	for(let j = 0; j < Object.keys(actions).length; j++){
-		let action = Object.keys(actions)[j];
-		log(`    Starting action '${bold(action)}'`);
-		let status = executeAction(path.resolve(dir, tasksLocation, task), actions[action]);
-		if(status !== 0) log('    ' + status, 'ERROR');
-	}
-	log(`Task '${bold(task)}' completed.`, 'SUCCESS');
+	log(`Starting task '${chalk.bold(task)}'`);
+	runActions(task, actions).then(() => {
+		log(`Task '${chalk.bold(task)}' completed.`, 'SUCCESS');
+	});
 }
-
-console.log();
