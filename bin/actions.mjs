@@ -28,7 +28,7 @@ async function copy(task, action, location, config){
 	let excludes = [];
 	if(typeof(config.excludes) === 'object' && config.excludes.length !== 0) excludes = config.excludes;
 
-	multiBar.addTask(task + ' | ' + action, { type: 'percentage' });
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.cyan, nameTransformFn: chalk.cyan });
 	//fs.copySync(copyFrom, resolve(location, 'output'), { filter: path => (!excludes.includes(path.replace(copyFrom, '')))});
 	multiBar.incrementTask(task + ' | ' + action, { percentage: 0.2 });
 
@@ -38,12 +38,12 @@ async function copy(task, action, location, config){
 async function sleep(task, action, config){
 	if(typeof(config.time) !== 'number') return new Promise((resolve, reject) => { reject("Action 'sleep' requires 'time' (Value in seconds)") });
 
-	multiBar.addTask(task + ' | ' + action, { type: 'percentage' });
-
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.red, nameTransformFn: chalk.red });
 	for(let i = 0; i < config.time; i++){
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		multiBar.incrementTask(task + ' | ' + action, { percentage: 1/config.time });
 	}
 
+	multiBar.done(task + ' | ' + action, { message: 'Finished!' });
 	return new Promise((resolve, reject) => { resolve() });
 }
