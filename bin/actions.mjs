@@ -1,9 +1,10 @@
 import fs from 'fs-extra';
 import { resolve } from 'path';
 import chalk from "chalk";
+import glob, { globSync } from 'glob';
 import { MultiProgressBars } from 'multi-progress-bars';
 
-const supportedActions = ['copy', 'sleep', 'remove'];
+const supportedActions = ['copy', 'sleep', 'remove', 'replace'];
 
 const multiBar = new MultiProgressBars({
 	initMessage: '',
@@ -19,6 +20,7 @@ export async function executeAction(task, action, location, config){
 	if(config.action === 'copy') return await copy(task, action, location, config);
 	if(config.action === 'sleep') return await sleep(task, action, config);
 	if(config.action === 'remove') return await remove(task, action, location, config);
+	if(config.action === 'replace') return await replace(task, action, location, config);
 }
 
 async function copy(task, action, location, config){
@@ -49,12 +51,30 @@ async function sleep(task, action, config){
 }
 
 async function remove(task, action, location, config){
-	if(typeof(config.files) !== 'object' || config.files.length === 0) return new Promise((resolve, reject) => { reject("Action 'remove' requires 'files'.")});
+	if(typeof(config.files) !== 'object' || config.files.length === 0) return new Promise((resolve, reject) => { reject("Action 'remove' requires 'files' array.")});
 
 	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.red, nameTransformFn: chalk.red });
 	for(let i = 0; i < config.files.length; i++){
 		fs.removeSync(resolve(location, 'output', config.files[i]));
-		multiBar.incrementTask(task + ' | ' + action, { percentage: i/config.files.length });
+		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/config.files.length });
+	}
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
+	return new Promise((resolve, reject) => { resolve() });
+}
+
+async function replace(task, action, location, config){
+	if(typeof(config.replace) !== 'object' || config.replace.length === 0) return new Promise((resolve, reject) => { reject("Action 'replace' requires 'replace' array.")});
+
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.green, nameTransformFn: chalk.green });
+	for(let i = 0; i < config.replace.length; i++){
+		let match = config.replace[i].match || '**';
+		let files = globSync(match, { cwd: resolve(location, 'output'), root: resolve(location, 'output'), nodir: true, absolute: true});
+		for(let j = 0; j < files.length; j++){
+			let data = fs.readFileSync(files[j], 'utf-8');
+			data = data.replaceAll(config.replace[i].from, config.replace[i].to);
+			fs.writeFileSync(files[j], data);
+		}
+		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/config.replace.length });
 	}
 	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 	return new Promise((resolve, reject) => { resolve() });
