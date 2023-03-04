@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { resolve } from 'path';
 import chalk from "chalk";
-import glob, { globSync } from 'glob';
+import { globSync } from 'glob';
 import { MultiProgressBars } from 'multi-progress-bars';
 
 const supportedActions = ['copy', 'sleep', 'remove', 'replace'];
