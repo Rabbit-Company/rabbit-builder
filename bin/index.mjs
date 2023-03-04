@@ -56,8 +56,6 @@ try{
 	process.exit();
 }
 
-console.log();
-
 log(chalk.bold(tasks.length) + " tasks detected. [" + chalk.bold(tasks) + "]");
 
 // Validate tasks
@@ -77,7 +75,6 @@ for(let i = 0; i < tasks.length; i++){
 tasks = vtasks;
 
 log(chalk.bold(validTasks) + " valid tasks and " + chalk.bold(invalidTasks) + " invalid tasks. Valid tasks: [" + chalk.bold(tasks) + "]");
-console.log();
 
 async function runActions(task, actions){
 	for(let j = 0; j < Object.keys(actions).length; j++){
