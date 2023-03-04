@@ -3,8 +3,11 @@ import { resolve } from 'path';
 import chalk from "chalk";
 import { globSync } from 'glob';
 import { MultiProgressBars } from 'multi-progress-bars';
+import * as htmlMinifier from 'html-minifier';
+import CleanCSS from 'clean-css';
+import { minify } from "terser";
 
-const supportedActions = ['copy', 'sleep', 'remove', 'replace'];
+const supportedActions = ['copy', 'sleep', 'remove', 'replace', 'minifyHTML', 'minifyCSS', 'minifyJS'];
 
 const multiBar = new MultiProgressBars({
 	initMessage: '',
@@ -21,6 +24,9 @@ export async function executeAction(task, action, location, config, variables){
 	if(config.action === 'sleep') return await sleep(task, action, config);
 	if(config.action === 'remove') return await remove(task, action, location, config);
 	if(config.action === 'replace') return await replace(task, action, location, config, variables);
+	if(config.action === 'minifyHTML') return await minifyHTML(task, action, location);
+	if(config.action === 'minifyCSS') return await minifyCSS(task, action, location);
+	if(config.action === 'minifyJS') return await minifyJS(task, action, location);
 }
 
 async function copy(task, action, location, config){
@@ -78,6 +84,48 @@ async function replace(task, action, location, config, variables){
 		}
 		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/config.replace.length });
 	}
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
+	return new Promise((resolve, reject) => { resolve() });
+}
+
+async function minifyHTML(task, action, location){
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.magenta, nameTransformFn: chalk.magenta });
+
+	let htmlFiles = globSync('**/*.html', { cwd: resolve(location, 'output'), root: resolve(location, 'output'), nodir: true, absolute: true});
+	for(let i = 0; i < htmlFiles.length; i++){
+		let data = fs.readFileSync(htmlFiles[i], 'utf-8');
+		fs.writeFileSync(htmlFiles[i], htmlMinifier.minify(data, { collapseWhitespace: true }));
+		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/htmlFiles.length });
+	}
+
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
+	return new Promise((resolve, reject) => { resolve() });
+}
+
+async function minifyCSS(task, action, location){
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.magenta, nameTransformFn: chalk.magenta });
+
+	let cssFiles = globSync('**/*.css', { cwd: resolve(location, 'output'), root: resolve(location, 'output'), nodir: true, absolute: true});
+	for(let i = 0; i < cssFiles.length; i++){
+		let data = fs.readFileSync(cssFiles[i], 'utf-8');
+		fs.writeFileSync(cssFiles[i], new CleanCSS({}).minify(data).styles);
+		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/cssFiles.length });
+	}
+
+	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
+	return new Promise((resolve, reject) => { resolve() });
+}
+
+async function minifyJS(task, action, location){
+	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.magenta, nameTransformFn: chalk.magenta });
+
+	let jsFiles = globSync('**/*.js', { cwd: resolve(location, 'output'), root: resolve(location, 'output'), nodir: true, absolute: true});
+	for(let i = 0; i < jsFiles.length; i++){
+		let data = fs.readFileSync(jsFiles[i], 'utf-8');
+		fs.writeFileSync(jsFiles[i], (await minify(data)).code);
+		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/jsFiles.length });
+	}
+
 	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 	return new Promise((resolve, reject) => { resolve() });
 }
