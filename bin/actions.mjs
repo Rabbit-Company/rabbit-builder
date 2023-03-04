@@ -13,14 +13,14 @@ const multiBar = new MultiProgressBars({
 	border: true,
 });
 
-export async function executeAction(task, action, location, config){
+export async function executeAction(task, action, location, config, variables){
 	if(typeof(config.action) !== 'string') return 1;
 	if(!supportedActions.includes(config.action)) return 2;
 
 	if(config.action === 'copy') return await copy(task, action, location, config);
 	if(config.action === 'sleep') return await sleep(task, action, config);
 	if(config.action === 'remove') return await remove(task, action, location, config);
-	if(config.action === 'replace') return await replace(task, action, location, config);
+	if(config.action === 'replace') return await replace(task, action, location, config, variables);
 }
 
 async function copy(task, action, location, config){
@@ -62,16 +62,18 @@ async function remove(task, action, location, config){
 	return new Promise((resolve, reject) => { resolve() });
 }
 
-async function replace(task, action, location, config){
+async function replace(task, action, location, config, variables){
 	if(typeof(config.replace) !== 'object' || config.replace.length === 0) return new Promise((resolve, reject) => { reject("Action 'replace' requires 'replace' array.")});
 
 	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.green, nameTransformFn: chalk.green });
 	for(let i = 0; i < config.replace.length; i++){
 		let match = config.replace[i].match || '**';
+		let to = config.replace[i].to || '';
+		if(Object.keys(variables).includes(to)) to = variables[to];
 		let files = globSync(match, { cwd: resolve(location, 'output'), root: resolve(location, 'output'), nodir: true, absolute: true});
 		for(let j = 0; j < files.length; j++){
 			let data = fs.readFileSync(files[j], 'utf-8');
-			data = data.replaceAll(config.replace[i].from, config.replace[i].to);
+			data = data.replaceAll(config.replace[i].from, to);
 			fs.writeFileSync(files[j], data);
 		}
 		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/config.replace.length });

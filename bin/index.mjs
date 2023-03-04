@@ -10,6 +10,7 @@ import { executeAction } from './actions.mjs';
 let config = {};
 let tasks = [];
 let taskConfig = {};
+let variables = {};
 
 displayTitle();
 
@@ -76,10 +77,11 @@ tasks = vtasks;
 
 log(chalk.bold(validTasks) + " valid tasks and " + chalk.bold(invalidTasks) + " invalid tasks. Valid tasks: [" + chalk.bold(tasks) + "]");
 
+variables = config.variables;
 async function runActions(task, actions){
 	for(let j = 0; j < Object.keys(actions).length; j++){
 		let action = Object.keys(actions)[j];
-		await executeAction(task, action, path.resolve(dir, tasksLocation, task), actions[action]).then().catch(message => {
+		await executeAction(task, action, path.resolve(dir, tasksLocation, task), actions[action], variables).then().catch(message => {
 			log(`[${task}][${action}] ` + message, 'ERROR');
 		});
 	}
