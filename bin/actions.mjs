@@ -28,7 +28,7 @@ async function copy(task, action, location, config){
 	if(typeof(config.excludes) === 'object' && config.excludes.length !== 0) excludes = config.excludes;
 
 	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.cyan, nameTransformFn: chalk.cyan });
-	fs.copySync(copyFrom, resolve(location, 'output'), { filter: path => (!excludes.includes(path.replace(copyFrom, '')))});
+	fs.copySync(copyFrom, resolve(location, 'output'), { overwrite: true, filter: path => (!excludes.includes(path.replace(copyFrom, '')))});
 	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 
 	return new Promise((resolve, reject) => { resolve() });
