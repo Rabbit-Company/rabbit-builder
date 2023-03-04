@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as fs from 'fs';
+import fs from 'fs-extra';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import chalk from "chalk";
@@ -90,6 +90,7 @@ for(let i = 0; i < Object.keys(taskConfig).length; i++){
 	let task = Object.keys(taskConfig)[i];
 	let actions = taskConfig[task];
 	log(`Starting task '${chalk.bold(task)}'`);
+	fs.removeSync(path.resolve(dir, tasksLocation, task, 'output'));
 	runActions(task, actions).then(() => {
 		log(`Task '${chalk.bold(task)}' completed.`, 'SUCCESS');
 	});
