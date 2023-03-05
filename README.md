@@ -82,6 +82,8 @@ Once you have your configuration files set up, you can use Rabbit Builder to per
 rabbit-builder
 # or
 rabbit-builder <task-name>
+# or
+rabbit-builder <task-name> <task-name> <task-name>...
 ```
 
 Replace `<task-name>` with the name of the task you want to perform. Rabbit Builder will then read the configuration file for that task and execute the specified actions.
