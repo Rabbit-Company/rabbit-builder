@@ -14,12 +14,12 @@
 		"rabbit-builder": "./bin/index.mjs"
 	},
 	"contributors": [
-    {
-      "name": "Rabbit Company",
-      "email": "info@rabbit-company.com",
-      "url": "https://github.com/Rabbit-Company"
-    }
-  ],
+		{
+			"name": "Rabbit Company",
+			"email": "info@rabbit-company.com",
+			"url": "https://github.com/Rabbit-Company"
+		}
+	],
 	"bugs": {
 		"url": "https://github.com/Rabbit-Company/rabbit-builder/issues",
 		"email": "info@rabbit-company.com"
