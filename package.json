@@ -1,7 +1,7 @@
 {
 	"name": "rabbit-builder",
 	"version": "1.0.0",
-	"description": "Rabbit Builder",
+	"description": "Automates basic development tasks using customizable configuration files",
 	"main": "./bin/index.mjs",
 	"type": "module",
 	"repository": "https://github.com/Rabbit-Company/rabbit-builder.git",
