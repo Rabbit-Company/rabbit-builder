@@ -14,15 +14,7 @@ let variables = {};
 
 displayTitle();
 
-if(process.argv.length < 3){
-	log("Please provide the path to the project directory.", 'ERROR');
-	log("Example 1 (Current directory): rabbit-builder .");
-	log("Example 2 (Relative path): rabbit-builder Passky/Passky-Client");
-	log("Example 3 (Absolute path): rabbit-builder /home/ziga/Documents/Projects/Passky/Passky-Client");
-	process.exit();
-}
-
-const dir = path.resolve(process.argv[2]);
+const dir = process.cwd();
 log("Project directory: " + dir);
 
 try{
@@ -43,12 +35,19 @@ try{
 	process.exit();
 }
 
+let executeTasks = [];
+if(process.argv.length > 2){
+	for(let i = 2; i < process.argv.length; i++){
+		executeTasks.push(process.argv[i]);
+	}
+}
+
 let tasksLocation = config.tasks.location || "apps";
 try{
 	const data = fs.readdirSync(path.resolve(dir, tasksLocation), 'utf8');
 	for(let i = 0; i < data.length; i++){
 		try{
-			if(fs.lstatSync(path.resolve(dir, tasksLocation, data[i])).isDirectory()) tasks.push(data[i]);
+			if(fs.lstatSync(path.resolve(dir, tasksLocation, data[i])).isDirectory() && (executeTasks.length === 0 || executeTasks.includes(data[i]))) tasks.push(data[i]);
 		}catch{};
 	}
 	log("Tasks directory: " + path.resolve(dir, tasksLocation));

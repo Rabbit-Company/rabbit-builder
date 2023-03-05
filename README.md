@@ -79,5 +79,22 @@ Example for `rabbit-task.json`:
 Once you have your configuration files set up, you can use Rabbit Builder to perform your tasks by running the following command in your project directory:
 
 ```bash
-rabbit-builder .
+rabbit-builder
+# or
+rabbit-builder <task-name>
 ```
+
+Replace `<task-name>` with the name of the task you want to perform. Rabbit Builder will then read the configuration file for that task and execute the specified actions.
+
+## Available Actions
+Rabbit Builder currently supports the following actions:
+
+- **copy**: Copy files from one directory to another
+- **sleep**: Pause execution for a specified amount of time
+- **remove**: Remove files from a directory
+- **replace**: Replace text in a file
+- **minifyHTML**: Minify HTML files
+- **minifyCSS**: Minify CSS files
+- **minifyJS**: Minify JavaScript files
+
+Each action can be configured with its own set of options to customize its behavior.
