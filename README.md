@@ -6,7 +6,7 @@ Rabbit Builder is a tool designed to automate some basic tasks that developers c
 
 To get started with Rabbit Builder, you'll need to have Node.js and NPM (Node Package Manager) installed on your system. Once you have these installed, you can install Rabbit Builder by running the following command:
 ```bash
-npm install -g rabbit-builder
+npm install -g @rabbit-company/rabbit-builder
 ```
 This will install Rabbit Builder globally on your system.
 
