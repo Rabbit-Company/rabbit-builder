@@ -4,12 +4,34 @@
 	"description": "Automates basic development tasks using customizable configuration files",
 	"main": "./bin/index.mjs",
 	"type": "module",
+	"homepage": "https://github.com/Rabbit-Company/rabbit-builder",
 	"repository": "https://github.com/Rabbit-Company/rabbit-builder.git",
+	"funding": "https://rabbit-company.com/donation",
 	"author": "Rabbit Company <info@rabbit-company.com>",
 	"license": "GPL-3.0",
+	"private": false,
 	"bin": {
 		"rabbit-builder": "./bin/index.mjs"
 	},
+	"contributors": [
+    {
+      "name": "Rabbit Company",
+      "email": "info@rabbit-company.com",
+      "url": "https://github.com/Rabbit-Company"
+    }
+  ],
+	"bugs": {
+		"url": "https://github.com/Rabbit-Company/rabbit-builder/issues",
+		"email": "info@rabbit-company.com"
+	},
+	"keywords": [
+		"build automation",
+		"developer tools",
+		"configuration files",
+		"task runner",
+		"file management",
+		"minification"
+	],
 	"dependencies": {
 		"chalk": "^5.2.0",
 		"clean-css": "^5.3.2",
