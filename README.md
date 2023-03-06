@@ -23,10 +23,10 @@ Example for `rabbit-builder.json`:
   "tasks": {
     "location": "apps"
   },
-	"variables": {
-		"{version}": "8.1.1",
-		"{copyrightYear}": "2023"
-	}
+  "variables": {
+    "{version}": "8.1.1",
+    "{copyrightYear}": "2023"
+  }
 }
 ```
 
@@ -35,42 +35,45 @@ Your tasks should be stored in folders located at the path specified in your `ra
 Example for `rabbit-task.json`:
 ```json
 {
-	"copy": {
-		"action": "copy",
-		"location": "../../src"
-	},
-	"sleep": {
-		"action": "sleep",
-		"time": 2
-	},
-	"remove": {
-		"action": "remove",
-		"files": ["register.html", "lang"]
-	},
-	"replace": {
-		"action": "replace",
-		"replace": [
-			{
-				"from": "::version::",
-				"to": "{version}",
-				"match": "**/*.{html,ts,js}"
-			},
-			{
-				"from": "::copyrightYear::",
-				"to": "{copyrightYear}",
-				"match": "**/*.{html,ts,js}"
-			}
-		]
-	},
-	"minifyHTML": {
-		"action": "minifyHTML"
-	},
-	"minifyCSS": {
-		"action": "minifyCSS"
-	},
-	"minifyJS": {
-		"action": "minifyJS"
-	}
+  "copy": {
+    "action": "copy",
+    "location": "../../src"
+  },
+  "sleep": {
+    "action": "sleep",
+    "time": 2
+  },
+  "remove": {
+    "action": "remove",
+    "files": ["register.html", "lang"]
+  },
+  "replace": {
+    "action": "replace",
+    "replace": [
+      {
+        "from": "::version::",
+        "to": "{version}",
+        "match": "**/*.{html,ts,js}"
+      },
+      {
+        "from": "::copyrightYear::",
+        "to": "{copyrightYear}",
+        "match": "**/*.{html,ts,js}"
+      }
+    ]
+  },
+  "minifyHTML": {
+    "action": "minifyHTML"
+  },
+  "minifyCSS": {
+    "action": "minifyCSS"
+  },
+  "minifyJS": {
+    "action": "minifyJS",
+    "sourceMap": {
+      "location": "js/sourceMap"
+    }
+  }
 }
 ```
 
