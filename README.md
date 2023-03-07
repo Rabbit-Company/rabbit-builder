@@ -70,9 +70,7 @@ Example for `rabbit-task.json`:
   },
   "minifyJS": {
     "action": "minifyJS",
-    "sourceMap": {
-      "location": "js/sourceMap"
-    }
+    "sourceMap": "linked"
   }
 }
 ```
