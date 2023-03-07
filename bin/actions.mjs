@@ -5,7 +5,7 @@ import { globSync } from 'glob';
 import { MultiProgressBars } from 'multi-progress-bars';
 import * as htmlMinifier from 'html-minifier';
 import CleanCSS from 'clean-css';
-import { minify } from "terser";
+import * as esbuild from 'esbuild';
 
 const supportedActions = ['copy', 'sleep', 'remove', 'replace', 'minifyHTML', 'minifyCSS', 'minifyJS'];
 
@@ -119,29 +119,17 @@ async function minifyCSS(task, action, output){
 async function minifyJS(task, action, output, config){
 	multiBar.addTask(task + ' | ' + action, { type: 'percentage', barTransformFn: chalk.magenta, nameTransformFn: chalk.magenta });
 
-	let sourceMapLocation = null;
-	if(typeof(config.sourceMap?.location) === 'string'){
-		sourceMapLocation = path.resolve(output, config.sourceMap.location);
-		if(!fs.existsSync(sourceMapLocation)) fs.mkdirSync(sourceMapLocation, { recursive: true });
-	}
-
 	let jsFiles = globSync('**/*.{js,mjs}', { cwd: output, root: output, nodir: true, absolute: true});
+	let entryPoints = [];
 	for(let i = 0; i < jsFiles.length; i++){
-		let data = fs.readFileSync(jsFiles[i], 'utf-8');
-		if(sourceMapLocation === null){
-			fs.writeFileSync(jsFiles[i], (await minify(data)).code);
-		}else{
-			let filePath = path.parse(jsFiles[i]);
-			let relFilePath = jsFiles[i].replace(output, '');
-			let mapFilePath = path.resolve(sourceMapLocation, filePath.base + '.map');
-			let relMapFilePath = mapFilePath.replace(output, '');
-
-			let minified = await minify({ [relFilePath]: data }, { sourceMap: { filename: relFilePath, url: relMapFilePath } });
-			fs.writeFileSync(jsFiles[i], minified.code);
-			fs.writeFileSync(mapFilePath, minified.map);
-		}
-		multiBar.incrementTask(task + ' | ' + action, { percentage: (i+1)/jsFiles.length });
+		entryPoints.push({in: jsFiles[i], out: jsFiles[i].replace('.js', '').replace('.mjs', '')});
 	}
+	let options = { entryPoints: entryPoints, write: true, outdir: output, allowOverwrite: true, minify: true, bundle: false, platform: 'browser' };
+	if(typeof(config.bundle) === 'object') options['bundle'] = true;
+	if(typeof(config.bundle?.platform) === 'string' && ['browser', 'node', 'neutral'].includes(config.bundle?.platform)) options['platform'] = config.bundle.platform;
+	if(typeof(config.sourceMap) === 'string' && ['linked', 'inline', 'external', 'both'].includes(config.sourceMap)) options['sourcemap'] = config.sourceMap;
+
+	await esbuild.build(options);
 
 	multiBar.done(task + ' | ' + action, { message: chalk.green('Finished!') });
 	return new Promise((resolve, reject) => { resolve() });
