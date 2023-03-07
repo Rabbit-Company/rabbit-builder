@@ -2,7 +2,6 @@
 
 import fs from 'fs-extra';
 import * as path from 'path';
-import * as crypto from 'crypto';
 import chalk from "chalk";
 import { displayTitle, log } from './utils.mjs';
 import { executeAction } from './actions.mjs';
@@ -42,18 +41,25 @@ if(process.argv.length > 2){
 	}
 }
 
-let tasksLocation = config.tasks.location || "apps";
-try{
-	const data = fs.readdirSync(path.resolve(dir, tasksLocation), 'utf8');
-	for(let i = 0; i < data.length; i++){
-		try{
-			if(fs.lstatSync(path.resolve(dir, tasksLocation, data[i])).isDirectory() && (executeTasks.length === 0 || executeTasks.includes(data[i]))) tasks.push(data[i]);
-		}catch{};
+let tasksLocation = config.tasks.location;
+if(typeof(tasksLocation) === 'undefined'){
+	let ptasks = Object.keys(config.tasks);
+	for(let i = 0; i < ptasks.length; i++){
+		if(executeTasks.length === 0 || executeTasks.includes(ptasks[i])) tasks.push(ptasks[i]);
 	}
-	log("Tasks directory: " + path.resolve(dir, tasksLocation));
-}catch(err){
-	log("The tasks directory is missing!", 'ERROR');
-	process.exit();
+}else{
+	try{
+		const data = fs.readdirSync(path.resolve(dir, tasksLocation), 'utf8');
+		for(let i = 0; i < data.length; i++){
+			try{
+				if(fs.lstatSync(path.resolve(dir, tasksLocation, data[i])).isDirectory() && (executeTasks.length === 0 || executeTasks.includes(data[i]))) tasks.push(data[i]);
+			}catch{};
+		}
+		log("Tasks directory: " + path.resolve(dir, tasksLocation));
+	}catch(err){
+		log("The tasks directory is missing!", 'ERROR');
+		process.exit();
+	}
 }
 
 log(chalk.bold(tasks.length) + " tasks detected. [" + chalk.bold(tasks) + "]");
@@ -62,25 +68,34 @@ log(chalk.bold(tasks.length) + " tasks detected. [" + chalk.bold(tasks) + "]");
 let validTasks = 0;
 let invalidTasks = 0;
 let vtasks = [];
-for(let i = 0; i < tasks.length; i++){
-	try{
-		const data = fs.readFileSync(path.resolve(dir, tasksLocation, tasks[i], 'rabbit-task.json'), 'utf8');
-		taskConfig[tasks[i]] = JSON.parse(data);
+if(typeof(tasksLocation) === 'undefined'){
+	for(let i = 0; i < tasks.length; i++){
+		if(typeof(config.tasks[tasks[i]].location) !== 'string') { invalidTasks++; continue; }
+		if(typeof(config.tasks[tasks[i]].execute) !== 'object') { invalidTasks++; continue; }
+		taskConfig[tasks[i]] = config.tasks[tasks[i]].execute;
 		vtasks.push(tasks[i]);
 		validTasks++;
-	}catch{
-		invalidTasks++;
+	}
+}else{
+	for(let i = 0; i < tasks.length; i++){
+		try{
+			const data = fs.readFileSync(path.resolve(dir, tasksLocation, tasks[i], 'rabbit-task.json'), 'utf8');
+			taskConfig[tasks[i]] = JSON.parse(data);
+			vtasks.push(tasks[i]);
+			validTasks++;
+		}catch{
+			invalidTasks++;
+		}
 	}
 }
 tasks = vtasks;
-
 log(chalk.bold(validTasks) + " valid tasks and " + chalk.bold(invalidTasks) + " invalid tasks. Valid tasks: [" + chalk.bold(tasks) + "]");
 
 variables = config.variables;
-async function runActions(task, actions){
+async function runActions(task, actions, location, output){
 	for(let j = 0; j < Object.keys(actions).length; j++){
 		let action = Object.keys(actions)[j];
-		await executeAction(task, action, path.resolve(dir, tasksLocation, task), actions[action], variables).then().catch(message => {
+		await executeAction(task, action, location, output, actions[action], variables).then().catch(message => {
 			log(`[${task}][${action}] ` + message, 'ERROR');
 		});
 	}
@@ -91,8 +106,17 @@ for(let i = 0; i < Object.keys(taskConfig).length; i++){
 	let task = Object.keys(taskConfig)[i];
 	let actions = taskConfig[task];
 	log(`Starting task '${chalk.bold(task)}'`);
-	fs.removeSync(path.resolve(dir, tasksLocation, task, 'output'));
-	runActions(task, actions).then(() => {
+	let location;
+	let output;
+	if(typeof(tasksLocation) === 'undefined'){
+		location = path.resolve(dir, config.tasks[task].location);
+		output = path.resolve(location, (config.tasks[task].output || 'output'));
+	}else{
+		location = path.resolve(dir, tasksLocation, task);
+		output = path.resolve(location, (config.tasks.output || 'output'));
+	}
+	fs.removeSync(output);
+	runActions(task, actions, location, output).then(() => {
 		log(`Task '${chalk.bold(task)}' completed.`, 'SUCCESS');
 	});
 }
