@@ -1,6 +1,6 @@
 {
 	"name": "@rabbit-company/rabbit-builder",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "Automates basic development tasks using customizable configuration files",
 	"main": "./bin/index.mjs",
 	"type": "module",
