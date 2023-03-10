@@ -127,6 +127,8 @@ async function minifyJS(task, action, output, config){
 	let options = { entryPoints: entryPoints, write: true, outdir: output, allowOverwrite: true, minify: true, bundle: false, platform: 'browser' };
 	if(typeof(config.bundle) === 'object') options['bundle'] = true;
 	if(typeof(config.bundle?.platform) === 'string' && ['browser', 'node', 'neutral'].includes(config.bundle?.platform)) options['platform'] = config.bundle.platform;
+	if(typeof(config.bundle?.format) === 'string' && ['iife', 'cjs', 'esm'].includes(config.bundle?.format)) options['format'] = config.bundle.format;
+	if(typeof(config.bundle?.minify) === 'boolean') options['minify'] = config.bundle.minify;
 	if(typeof(config.sourceMap) === 'string' && ['linked', 'inline', 'external', 'both'].includes(config.sourceMap)) options['sourcemap'] = config.sourceMap;
 
 	await esbuild.build(options);
